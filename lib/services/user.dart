@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class User {
   String? cnic;
   String? password;
@@ -14,4 +16,16 @@ class User {
     this.password,
     this.userName,
   });
+
+  factory User.fromDocument(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return User(
+      cnic: data['cnic'],
+      password: data['password'],
+      confirmPassword: data['confirmPassword'],
+      gender: data['gender'],
+      userName: data['userName'],
+      dob: data['dob']?.toDate(),
+    );
+  }
 }

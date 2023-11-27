@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
 import 'package:doctor_appointment_app/services/auth.dart';
 import 'package:doctor_appointment_app/services/user.dart';
 import 'package:flutter/material.dart';
@@ -96,26 +98,40 @@ class _LoginViewState extends State<LoginView> {
                   text: "Login",
                   ontap: () async {
                     try {
-                      Auth.registerUser(context, cnic, pass);
+                      // Check if the user exists in Firestore
+                      bool userExists = await Auth.doesUserExist(cnic);
 
-                      var snackbar =
-                          const SnackBar(content: Text("Account not found!"));
-                      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                      if (userExists) {
+                        // User exists, validate credentials
+                        bool isValidCredentials =
+                            await Auth.validateCredentials(cnic, pass);
+
+                        if (isValidCredentials) {
+                          // Navigate to the home view
+                          Auth.authenticateUser(context, cnic, pass);
+                        } else {
+                          // Show a snackbar with an authentication error
+                          var snackbar = const SnackBar(
+                            content: Text(
+                                "Invalid credentials. Please check your CNIC and password."),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                        }
+                      } else {
+                        // User does not exist, show a snackbar
+                        var snackbar = SnackBar(
+                          backgroundColor:
+                              const Color.fromARGB(255, 115, 211, 255),
+                          content: Text(
+                            "Account not found, Please Register Yourself!",
+                            style: colour,
+                          ),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                      }
                     } catch (e) {
                       print('Error during login: $e');
                     }
-                    // if (cnic == widget.user?.cnic &&
-                    //     pass == widget.user?.password) {
-                    //   Auth.registerUser(context, cnic, pass);
-                    // } else if (widget.user == null) {
-                    //   var snackbar =
-                    //       const SnackBar(content: Text("Account not found!"));
-                    //   ScaffoldMessenger.of(context).showSnackBar(snackbar);
-                    // } else {
-                    //   var snackbar =
-                    //       const SnackBar(content: Text("Account not found!"));
-                    //   ScaffoldMessenger.of(context).showSnackBar(snackbar);
-                    // }
                   },
                 ),
                 const SizedBox(

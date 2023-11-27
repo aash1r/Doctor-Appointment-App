@@ -1,20 +1,33 @@
 // final currentUser = FirebaseAuth.instance.currentUser;
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../components/category_detail.dart';
-import '../components/detail_tile.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../services/auth.dart';
 import 'login_view.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  final String cnic;
+  const HomeView({super.key, required this.cnic});
 
   @override
   State<HomeView> createState() => _HomeViewState();
 }
 
 class _HomeViewState extends State<HomeView> {
-  String doctorCategory = 'All';
+  Map<String, dynamic> userData = {};
+
+  @override
+  void initState() {
+    super.initState();
+    // Replace 'userCnic' with the actual CNIC of the logged-in user
+    loadUserData(widget.cnic);
+  }
+
+  Future<void> loadUserData(String cnic) async {
+    Map<String, dynamic> data = await Auth.getUserData(cnic);
+    setState(() {
+      userData = data;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +48,7 @@ class _HomeViewState extends State<HomeView> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
-                height: 400,
+                height: 80,
                 width: double.infinity,
                 decoration: const BoxDecoration(
                     color: Color(0xffB28cff),
@@ -43,174 +56,69 @@ class _HomeViewState extends State<HomeView> {
                       bottomLeft: Radius.circular(30),
                       bottomRight: Radius.circular(30),
                     )),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const LoginView()));
+                          },
+                          child: const Icon(
+                            Icons.logout,
+                          )),
+                      const SizedBox(
+                        width: 42,
+                      ),
+                      Text('Welcome Again!',
+                          style: GoogleFonts.poppins(
+                              color: Colors.black,
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Center(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => const LoginView()));
-                              },
-                              child: const Icon(Icons.logout)),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'Welcome Back',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w300),
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        "Let's find\nyour top doctor!",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 40,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 22,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        "Doctor's Inn",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 50,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                    Text('Your Details',
+                        style: GoogleFonts.poppins(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20)),
                     const SizedBox(
                       height: 20,
-                    )
+                    ),
+                    const Icon(
+                      Icons.person,
+                      size: 60,
+                    ),
+                    Text(
+                      "${userData['userName']}",
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w400, fontSize: 20),
+                    ),
+                    Text("${userData['gender']}",
+                        style:
+                            GoogleFonts.poppins(fontWeight: FontWeight.w400)),
+                    Text("${userData['cnic']}",
+                        style:
+                            GoogleFonts.poppins(fontWeight: FontWeight.w400)),
+                    const SizedBox(
+                      height: 20,
+                    ),
                   ],
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const Padding(
-                padding: EdgeInsets.only(left: 15.0),
-                child: Text(
-                  'Categories',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  CategoryContainer(
-                      categoryName: 'All',
-                      image: 'assets/all.svg',
-                      onTap: () {
-                        setState(() {
-                          doctorCategory = "All";
-                        });
-                        print(doctorCategory);
-                      }),
-                  CategoryContainer(
-                      categoryName: 'Cardioligy',
-                      image: 'assets/cardioligy.svg',
-                      onTap: () {
-                        setState(() {
-                          doctorCategory = "Cardioligy";
-                        });
-                        print(doctorCategory);
-                      }),
-                  CategoryContainer(
-                      categoryName: 'Medicine',
-                      image: 'assets/medicine.svg',
-                      onTap: () {
-                        setState(() {
-                          doctorCategory = "Medicine";
-                        });
-                      }),
-                  CategoryContainer(
-                      categoryName: 'General',
-                      image: 'assets/general.svg',
-                      onTap: () {
-                        setState(() {
-                          doctorCategory = "General";
-                        });
-                      }),
-                ],
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection("Catogries")
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.active) {
-                      if (snapshot.hasData && snapshot.data != null) {
-                        return ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: doctorCategory == 'All'
-                                ? snapshot.data?.docs.length
-                                : snapshot.data?.docs
-                                    .where((element) =>
-                                        element["Type"] == doctorCategory)
-                                    .length,
-                            itemBuilder: ((context, index) {
-                              final uMap = snapshot.data!.docs[index].data();
-                              print("type: ${uMap['Type']}");
-                              print("cat: $doctorCategory");
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              //  Appointmentscreen
-                                              const LoginView()));
-                                },
-                                child: DetailTile(
-                                  user: uMap,
-                                ),
-                              );
-                            }));
-                      }
-                      return const Center(
-                        child: Text("No Items to display!"),
-                      );
-                    }
-                    return const Center(
-                        child: CircularProgressIndicator(
-                      color: Colors.purple,
-                    ));
-                  })
+              )
             ],
           ),
         ),

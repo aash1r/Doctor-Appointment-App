@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,25 +18,33 @@ class SignupView extends StatefulWidget {
 }
 
 class _SignupViewState extends State<SignupView> {
+  DateTime? selectedDate;
   String cnic = "";
   String pass = "";
   final user = User();
   void signUp() async {
-    bool userExists = await Auth.doesUserExist(cnic);
-
-    if (userExists) {
-      // User exists, perform login logic
-      var snackbar = const SnackBar(content: Text("User already exists!"));
+    if (user.userName == null ||
+        user.password == null ||
+        user.confirmPassword == null ||
+        user.gender == null ||
+        user.cnic == null) {
+      var snackbar =
+          const SnackBar(content: Text("Please fill all the fields"));
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
-      // } else {
-      //   // User does not exist
-      //   var snackbar = const SnackBar(content: Text("Account not found!"));
-      //   ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    }
-    if (user.password != user.confirmPassword) {
-      Navigator.pop(context);
+      return;
+    } else if (user.password != user.confirmPassword) {
       var snackbar = const SnackBar(content: Text("Passwords do not match!"));
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      Navigator.pop(context);
+    }
+    bool userExists = await Auth.doesUserExist(user.cnic!);
+
+    if (userExists) {
+      var snackbar = const SnackBar(content: Text("User already exists!"));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    } else {
+      user.dob = selectedDate;
+      Auth.registerUser(context, user.cnic ?? "", user.password ?? "", user);
     }
   }
 
@@ -175,10 +185,30 @@ class _SignupViewState extends State<SignupView> {
                 const SizedBox(
                   height: 5,
                 ),
-                MyTextfield(
+                GestureDetector(
+                  onTap: () async {
+                    final DateTime picked = (await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime.now(),
+                    ))!;
+
+                    if (picked != selectedDate) {
+                      setState(() {
+                        selectedDate = picked;
+                      });
+                    }
+                  },
+                  child: MyTextfield(
                     onChanged: (val) {},
-                    hintText: "4/12/1998",
-                    icon: Icons.calendar_month),
+                    hintText: selectedDate != null
+                        ? selectedDate.toString().split(" ")[0]
+                        : "Select Date",
+                    icon: Icons.calendar_today,
+                    read: true,
+                  ),
+                ),
                 const SizedBox(
                   height: 40,
                 ),

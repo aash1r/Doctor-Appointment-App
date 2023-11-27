@@ -10,8 +10,10 @@ class MyTextfield extends StatefulWidget {
     required this.onChanged,
     this.value,
     this.value1,
+    this.read,
   });
 
+  final bool? read;
   final Function()? onTap;
   final Function(String) onChanged;
   final IconData? icon;
@@ -28,6 +30,7 @@ class _MyTextfieldState extends State<MyTextfield> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      readOnly: widget.read ?? false,
       onChanged: widget.onChanged,
       cursorColor: Colors.black38,
       obscureText: widget.icon != null ? false : obsecureText,
