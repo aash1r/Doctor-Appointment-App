@@ -1,7 +1,7 @@
-// final currentUser = FirebaseAuth.instance.currentUser;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/auth.dart';
+import '../services/user.dart';
 import 'login_view.dart';
 
 class HomeView extends StatefulWidget {
@@ -13,20 +13,17 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  Map<String, dynamic> userData = {};
+  User? user;
 
   @override
   void initState() {
     super.initState();
-    // Replace 'userCnic' with the actual CNIC of the logged-in user
     loadUserData(widget.cnic);
   }
 
   Future<void> loadUserData(String cnic) async {
-    Map<String, dynamic> data = await Auth.getUserData(cnic);
-    setState(() {
-      userData = data;
-    });
+    user = await Auth.getUserData(cnic);
+    setState(() {});
   }
 
   @override
@@ -103,16 +100,21 @@ class _HomeViewState extends State<HomeView> {
                       size: 60,
                     ),
                     Text(
-                      "${userData['userName']}",
+                      user?.userName ?? '',
                       style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w400, fontSize: 20),
                     ),
-                    Text("${userData['gender']}",
+                    Text(user?.gender ?? '',
                         style:
                             GoogleFonts.poppins(fontWeight: FontWeight.w400)),
-                    Text("${userData['cnic']}",
+                    Text(user?.cnic ?? '',
                         style:
                             GoogleFonts.poppins(fontWeight: FontWeight.w400)),
+                    Text(
+                      user?.dob.toString() ??
+                          "", // user?.dob.toString() ?? 'DOB',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w400),
+                    ),
                     const SizedBox(
                       height: 20,
                     ),

@@ -1,12 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class User {
   String? cnic;
   String? password;
   String? confirmPassword;
   String? gender;
   String? userName;
-  DateTime? dob;
+  String? dob;
 
   User({
     this.cnic,
@@ -17,15 +15,14 @@ class User {
     this.userName,
   });
 
-  factory User.fromDocument(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+  factory User.fromDocument(Map<String, dynamic> data) {
     return User(
       cnic: data['cnic'],
       password: data['password'],
       confirmPassword: data['confirmPassword'],
       gender: data['gender'],
       userName: data['userName'],
-      dob: data['dob']?.toDate(),
+      dob: data['dob'],
     );
   }
 }

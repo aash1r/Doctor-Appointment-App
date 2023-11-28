@@ -36,14 +36,13 @@ class Auth {
     return true;
   }
 
-  static void registerUser(
-      BuildContext context, String cnic, String pass, User user) {
-    final isNicValidated = validateCnic(cnic, context);
-    final isPassValidated = validatePassword(pass, context);
+  static void registerUser(BuildContext context, User user) {
+    final isNicValidated = validateCnic(user.cnic!, context);
+    final isPassValidated = validatePassword(user.password!, context);
     if (isNicValidated && isPassValidated) {
-      firestore.collection('users').doc().set({
-        'cnic': cnic.trim(),
-        'password': pass.trim(),
+      firestore.collection('patients').doc().set({
+        'cnic': user.cnic!.trim(),
+        'password': user.password!.trim(),
         'confirmpassword': user.confirmPassword,
         'gender': user.gender, // Add more fields as needed
         'userName': user.userName,
@@ -54,7 +53,7 @@ class Auth {
             context,
             MaterialPageRoute(
                 builder: (_) => HomeView(
-                      cnic: cnic,
+                      cnic: user.cnic!,
                     )));
       });
     }
@@ -91,7 +90,6 @@ class Auth {
           });
           // Navigate to the home view
         } else {
-          // Show a snackbar with an authentication error
           var snackbar = const SnackBar(
             content: Text(
                 "Invalid credentials. Please check your CNIC and password."),
@@ -100,7 +98,6 @@ class Auth {
         }
       } else {
         print('Invalid credentials!');
-        // User does not exist, show a snackbar or handle as needed
         var snackbar = const SnackBar(
           content: Text("User not found. Please register first."),
         );
@@ -109,42 +106,38 @@ class Auth {
     }
   }
 
-  static Future<Map<String, dynamic>> getUserData(String cnic) async {
+  static Future<User> getUserData(String cnic) async {
     try {
-      // Use a query to find the document where 'cnic' field matches the provided CNIC
       QuerySnapshot query = await firestore
-          .collection('users')
+          .collection('patients')
           .where('cnic', isEqualTo: cnic)
           .get();
 
       if (query.docs.isNotEmpty) {
-        // Assuming there's only one document for a given CNIC, use the first one
         DocumentSnapshot userDoc = query.docs.first;
-        return userDoc.data() as Map<String, dynamic>;
+        final user = userDoc.data() as Map<String, dynamic>;
+        return User.fromDocument(user);
       } else {
         print('User not found for CNIC: $cnic');
-        return {}; // Return an empty map if user is not found
+        return User(); // Return an empty map if user is not found
       }
     } catch (e) {
       print('Error fetching user data for CNIC $cnic: $e');
-      return {}; // Return an empty map on error
+      return User(); // Return an empty map on error
     }
   }
 
   static Future<bool> validateCredentials(String cnic, String password) async {
     try {
-      // Query the collection based on the CNIC field
       QuerySnapshot query = await firestore
-          .collection('users')
+          .collection('patients')
           .where('cnic', isEqualTo: cnic)
           .get();
 
       if (query.docs.isNotEmpty) {
-        // User found, check if the provided password matches the stored password
         String storedPassword = query.docs.first['password'];
         return storedPassword == password;
       } else {
-        // User not found
         return false;
       }
     } catch (e) {
@@ -154,11 +147,38 @@ class Auth {
   }
 
   static Future<bool> doesUserExist(String cnic) async {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    CollectionReference users =
+        FirebaseFirestore.instance.collection('patients');
 
     QuerySnapshot query = await users.where('cnic', isEqualTo: cnic).get();
     print('Query result: ${query.docs}');
-    // Check if any documents match the query
     return query.docs.isNotEmpty;
+  }
+
+  static void signUp(User user, BuildContext context) async {
+    if (user.userName == null ||
+        user.password == null ||
+        user.confirmPassword == null ||
+        user.gender == null ||
+        user.cnic == null ||
+        user.dob == null) {
+      print(user.dob);
+      var snackbar =
+          const SnackBar(content: Text("Please fill all the fields"));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      return;
+    } else if (user.password != user.confirmPassword) {
+      var snackbar = const SnackBar(content: Text("Passwords do not match!"));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      Navigator.pop(context);
+    }
+    bool userExists = await Auth.doesUserExist(user.cnic!);
+
+    if (userExists) {
+      var snackbar = const SnackBar(content: Text("User already exists!"));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    } else {
+      Auth.registerUser(context, user);
+    }
   }
 }

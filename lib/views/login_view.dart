@@ -2,13 +2,14 @@
 
 import 'package:doctor_appointment_app/services/auth.dart';
 import 'package:doctor_appointment_app/services/user.dart';
+import 'package:doctor_appointment_app/views/patient/patient_signup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../components/my_button.dart';
+import '../components/my_row.dart';
 import '../components/my_textfield.dart';
 import '../services/helpers.dart';
-import 'signup_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({
@@ -53,14 +54,7 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(
                   height: 20,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "National-Id",
-                      style: colour,
-                    ),
-                  ],
-                ),
+                const MyRow(labelText: "National-Id"),
                 const SizedBox(
                   height: 5,
                 ),
@@ -74,14 +68,7 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(
                   height: 20,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "Password",
-                      style: colour,
-                    ),
-                  ],
-                ),
+                const MyRow(labelText: "Password"),
                 const SizedBox(
                   height: 5,
                 ),
@@ -95,6 +82,7 @@ class _LoginViewState extends State<LoginView> {
                   height: 40,
                 ),
                 MyButton(
+                  font: 25,
                   text: "Login",
                   ontap: () async {
                     try {
@@ -124,7 +112,7 @@ class _LoginViewState extends State<LoginView> {
                               const Color.fromARGB(255, 115, 211, 255),
                           content: Text(
                             "Account not found, Please Register Yourself!",
-                            style: colour,
+                            style: Helpers.colour,
                           ),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackbar);
@@ -133,6 +121,8 @@ class _LoginViewState extends State<LoginView> {
                       print('Error during login: $e');
                     }
                   },
+                  width: 300,
+                  height: 60,
                 ),
                 const SizedBox(
                   height: 20,
@@ -146,7 +136,7 @@ class _LoginViewState extends State<LoginView> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => const SignupView()));
+                                builder: (_) => const PatientSignup()));
                       },
                       child: Text(
                         " Register yourself now!",

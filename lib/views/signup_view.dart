@@ -1,8 +1,11 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, must_be_immutable
 
+import 'package:doctor_appointment_app/components/my_row.dart';
+import 'package:doctor_appointment_app/views/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 import '../services/auth.dart';
@@ -10,43 +13,34 @@ import '../services/helpers.dart';
 import '../services/user.dart';
 
 class SignupView extends StatefulWidget {
-  const SignupView({super.key, this.ontap});
+  const SignupView(
+      {super.key,
+      this.ontap,
+      required this.name,
+      required this.passw,
+      required this.gender,
+      required this.nic,
+      required this.dob,
+      required this.cpassw,
+      required this.user});
   final Function()? ontap;
+  final Function(String) name;
+  final Function(String) passw;
+  final Function(String) cpassw;
+  final Function(String) gender;
+  final Function(String) nic;
+  final Function(String) dob;
+  final User user;
 
   @override
   State<SignupView> createState() => _SignupViewState();
 }
 
 class _SignupViewState extends State<SignupView> {
-  DateTime? selectedDate;
   String cnic = "";
   String pass = "";
-  final user = User();
-  void signUp() async {
-    if (user.userName == null ||
-        user.password == null ||
-        user.confirmPassword == null ||
-        user.gender == null ||
-        user.cnic == null) {
-      var snackbar =
-          const SnackBar(content: Text("Please fill all the fields"));
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
-      return;
-    } else if (user.password != user.confirmPassword) {
-      var snackbar = const SnackBar(content: Text("Passwords do not match!"));
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
-      Navigator.pop(context);
-    }
-    bool userExists = await Auth.doesUserExist(user.cnic!);
 
-    if (userExists) {
-      var snackbar = const SnackBar(content: Text("User already exists!"));
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    } else {
-      user.dob = selectedDate;
-      Auth.registerUser(context, user.cnic ?? "", user.password ?? "", user);
-    }
-  }
+  final TextEditingController _dateController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -74,147 +68,122 @@ class _SignupViewState extends State<SignupView> {
                 const SizedBox(
                   height: 20,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "Your Name",
-                      style: colour,
-                    ),
-                  ],
-                ),
+                const MyRow(labelText: "Your Name"),
                 const SizedBox(
                   height: 5,
                 ),
                 MyTextfield(
-                    onChanged: (val) {
-                      user.userName = val;
-                    },
+                    onChanged: widget.name,
+                    // user.userName
+
                     hintText: "Name",
                     icon: Icons.person),
                 const SizedBox(
                   height: 20,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "Password",
-                      style: colour,
-                    ),
-                  ],
-                ),
+                const MyRow(labelText: "Password"),
                 const SizedBox(
                   height: 5,
                 ),
                 MyTextfield(
-                    onChanged: (val) {
-                      user.password = val;
-                    },
+                    onChanged: widget.passw,
+                    // (val) {
+                    //   user.password = val;
+                    // },
                     hintText: "Password",
                     icon: Icons.remove_red_eye),
                 const SizedBox(
                   height: 20,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "Confirm Password",
-                      style: colour,
-                    ),
-                  ],
-                ),
+                const MyRow(labelText: "Confirm Password"),
                 const SizedBox(
                   height: 5,
                 ),
                 MyTextfield(
-                    onChanged: (val) {
-                      user.confirmPassword = val;
-                    },
-                    hintText: "Confirm Password",
+                    onChanged: widget.cpassw,
+                    // (val) {
+                    //   user.confirmPassword = val;
+                    // },
+                    hintText: "Password",
                     icon: Icons.remove_red_eye),
                 const SizedBox(
                   height: 20,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "Gender",
-                      style: colour,
-                    ),
-                  ],
-                ),
+                const MyRow(labelText: "Gender"),
                 const SizedBox(
                   height: 5,
                 ),
                 MyTextfield(
-                    onChanged: (val) {
-                      user.gender = val;
-                    },
-                    hintText: "Male",
+                    onChanged: widget.gender,
+                    // (val) {
+                    //   user.gender = val;
+                    // },
+                    hintText: "Gender",
                     icon: Icons.male),
                 const SizedBox(
                   height: 20,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "National-ID",
-                      style: colour,
-                    ),
-                  ],
-                ),
+                const MyRow(labelText: "Cnic"),
                 const SizedBox(
                   height: 5,
                 ),
                 MyTextfield(
-                    onChanged: (val) {
-                      user.cnic = val;
-                    },
+                    onChanged: widget.nic,
+                    // (val) {
+                    //   user.cnic = val;
+                    // },
                     hintText: "CNIC",
                     icon: Icons.perm_identity),
                 const SizedBox(
                   height: 20,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "D.O.B",
-                      style: colour,
-                    ),
-                  ],
-                ),
+                const MyRow(labelText: "D.O.B"),
                 const SizedBox(
                   height: 5,
                 ),
-                GestureDetector(
+                TextField(
+                  readOnly: true,
+                  controller: _dateController,
+                  decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue.shade600),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue.shade600),
+                      ),
+                      suffixIconColor: Colors.blue.shade600,
+                      hintStyle: GoogleFonts.poppins(
+                          color: Colors.black38, fontSize: 13),
+                      hintText: "Select Date",
+                      suffixIcon: const Icon(Icons.calendar_today)),
                   onTap: () async {
-                    final DateTime picked = (await showDatePicker(
+                    final DateTime? picked = await showDatePicker(
                       context: context,
                       initialDate: DateTime.now(),
                       firstDate: DateTime(1900),
                       lastDate: DateTime.now(),
-                    ))!;
+                    );
 
-                    if (picked != selectedDate) {
+                    if (picked != null) {
+                      String date = DateFormat('dd-MM-yyyy').format(picked);
                       setState(() {
-                        selectedDate = picked;
+                        widget.user.dob = date;
+                        _dateController.text = date;
                       });
                     }
                   },
-                  child: MyTextfield(
-                    onChanged: (val) {},
-                    hintText: selectedDate != null
-                        ? selectedDate.toString().split(" ")[0]
-                        : "Select Date",
-                    icon: Icons.calendar_today,
-                    read: true,
-                  ),
                 ),
                 const SizedBox(
                   height: 40,
                 ),
                 MyButton(
+                  font: 25,
                   text: "Sign In",
-                  ontap: signUp,
+                  ontap: () {
+                    Auth.signUp(widget.user, context);
+                  },
+                  width: 300,
+                  height: 60,
                 ),
                 const SizedBox(
                   height: 20,
@@ -224,13 +193,21 @@ class _SignupViewState extends State<SignupView> {
                   children: [
                     Text(
                       "Already have an account?",
-                      style: colour,
+                      style: Helpers.colour,
                     ),
-                    Text(
-                      " Login!",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blueGrey.shade900),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const LoginView()));
+                      },
+                      child: Text(
+                        " Login!",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey.shade900),
+                      ),
                     ),
                   ],
                 )
