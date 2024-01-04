@@ -1,4 +1,5 @@
 import 'package:doctor_appointment_app/services/user.dart';
+import 'package:doctor_appointment_app/views/login_view.dart';
 import 'package:doctor_appointment_app/views/signup_view.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,14 @@ class _PatientSignupState extends State<PatientSignup> {
   @override
   Widget build(BuildContext context) {
     return SignupView(
+      onLoginTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => const LoginView(
+                      role: 'Patient',
+                    )));
+      },
       name: (val) {
         user.userName = val;
       },
@@ -33,6 +42,7 @@ class _PatientSignupState extends State<PatientSignup> {
         user.confirmPassword = val;
       },
       user: user,
+      role: 'Patient',
     );
   }
 }

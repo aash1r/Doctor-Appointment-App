@@ -2,6 +2,8 @@ import 'package:doctor_appointment_app/services/user.dart';
 import 'package:doctor_appointment_app/views/signup_view.dart';
 import 'package:flutter/material.dart';
 
+import '../login_view.dart';
+
 class DoctorSignup extends StatefulWidget {
   const DoctorSignup({super.key});
 
@@ -14,6 +16,14 @@ class _DoctorSignupState extends State<DoctorSignup> {
   @override
   Widget build(BuildContext context) {
     return SignupView(
+      onLoginTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => const LoginView(
+                      role: 'Doctor',
+                    )));
+      },
       name: (val) {
         user.userName = val;
       },
@@ -33,6 +43,7 @@ class _DoctorSignupState extends State<DoctorSignup> {
         user.confirmPassword = val;
       },
       user: user,
+      role: 'Doctor',
     );
   }
 }

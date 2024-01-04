@@ -37,9 +37,12 @@ dependencies:
   flutter_svg: ^2.0.9
   firebase_core: ^2.22.0
   google_fonts: ^6.1.0
+  grouped_list: ^5.1.2
+  flutter_chat_ui: ^1.6.10
   cloud_firestore: ^4.13.1
   intl: ^0.18.1
   lottie: ^2.7.0
+  uuid: ^4.2.2
 
 dev_dependencies:
   flutter_test:

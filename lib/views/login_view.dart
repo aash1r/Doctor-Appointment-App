@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:doctor_appointment_app/services/auth.dart';
-import 'package:doctor_appointment_app/services/user.dart';
 import 'package:doctor_appointment_app/views/patient/patient_signup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -14,9 +13,9 @@ import '../services/helpers.dart';
 class LoginView extends StatefulWidget {
   const LoginView({
     super.key,
-    this.user,
+    this.role,
   });
-  final User? user;
+  final String? role;
   @override
   State<LoginView> createState() => _LoginViewState();
 }
@@ -86,17 +85,21 @@ class _LoginViewState extends State<LoginView> {
                   text: "Login",
                   ontap: () async {
                     try {
-                      // Check if the user exists in Firestore
-                      bool userExists = await Auth.doesUserExist(cnic);
-
+                      // Check if the
+                      // user exists in Firestore
+                      bool userExists =
+                          await Auth.doesUserExist(cnic, widget.role ?? "");
+                      print('userExist: $userExists');
                       if (userExists) {
                         // User exists, validate credentials
                         bool isValidCredentials =
-                            await Auth.validateCredentials(cnic, pass);
-
+                            await Auth.validateCredentials(
+                                cnic, pass, widget.role ?? "");
+                        print('Validity: $isValidCredentials');
                         if (isValidCredentials) {
                           // Navigate to the home view
-                          Auth.authenticateUser(context, cnic, pass);
+                          Auth.authenticateUser(
+                              context, cnic, pass, widget.role ?? "");
                         } else {
                           // Show a snackbar with an authentication error
                           var snackbar = const SnackBar(

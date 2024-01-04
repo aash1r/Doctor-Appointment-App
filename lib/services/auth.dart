@@ -1,9 +1,9 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:doctor_appointment_app/views/doctor/doctor_homeview.dart';
+import 'package:doctor_appointment_app/views/patient/patient_homeview.dart';
 import 'package:flutter/material.dart';
-
-import '../views/home_view.dart';
 import 'user.dart';
 
 class Auth {
@@ -36,42 +36,56 @@ class Auth {
     return true;
   }
 
-  static void registerUser(BuildContext context, User user) {
+  static void registerUser(BuildContext context, User user, String role) {
     final isNicValidated = validateCnic(user.cnic!, context);
     final isPassValidated = validatePassword(user.password!, context);
     if (isNicValidated && isPassValidated) {
-      firestore.collection('patients').doc().set({
+      firestore.collection(role).doc().set({
         'cnic': user.cnic!.trim(),
         'password': user.password!.trim(),
         'confirmpassword': user.confirmPassword,
         'gender': user.gender, // Add more fields as needed
         'userName': user.userName,
         'dob': user.dob,
+        'role': role
       });
-      Future.delayed(const Duration(milliseconds: 300), () async {
-        await Navigator.push(
+      if (role == "Doctor") {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (_) => HomeView(
+                builder: (_) => DoctorHomeView(
                       cnic: user.cnic!,
-                    )));
-      });
+                    )),
+          );
+        });
+      } else {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => PatientHomeView(
+                      cnic: user.cnic!,
+                    )),
+          );
+        });
+      }
     }
   }
 
   static authenticateUser(
-      BuildContext context, String cnic, String pass) async {
+      BuildContext context, String cnic, String pass, String role) async {
     final isNicValidated = validateCnic(cnic, context);
     final isPassValidated = validatePassword(pass, context);
 
     bool userExist = false;
     if (isNicValidated && isPassValidated) {
       // Check if the user exists in Firestore
-      userExist = await doesUserExist(cnic);
+      userExist = await doesUserExist(cnic, role);
 
       if (userExist) {
         // User exists, validate credentials and log in
-        bool isValidCredentials = await validateCredentials(cnic, pass);
+        bool isValidCredentials = await validateCredentials(cnic, pass, role);
 
         if (isValidCredentials) {
           var snackbar = const SnackBar(
@@ -79,15 +93,28 @@ class Auth {
             content: Text("Successful Login!"),
           );
           ScaffoldMessenger.of(context).showSnackBar(snackbar);
-          Future.delayed(const Duration(milliseconds: 300), () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => HomeView(
-                        cnic: cnic,
-                      )),
-            );
-          });
+          if (role == "Doctor") {
+            Future.delayed(const Duration(milliseconds: 300), () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => DoctorHomeView(
+                          cnic: cnic,
+                        )),
+              );
+            });
+          } else {
+            Future.delayed(const Duration(milliseconds: 300), () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => PatientHomeView(
+                          cnic: cnic,
+                        )),
+              );
+            });
+          }
+
           // Navigate to the home view
         } else {
           var snackbar = const SnackBar(
@@ -106,10 +133,11 @@ class Auth {
     }
   }
 
-  static Future<User> getUserData(String cnic) async {
+  static Future<User> getUserData(String cnic, String role) async {
     try {
+      print('Role: $role, CNIC: $cnic');
       QuerySnapshot query = await firestore
-          .collection('patients')
+          .collection(role == 'Doctor' ? "Doctor" : "Patient")
           .where('cnic', isEqualTo: cnic)
           .get();
 
@@ -127,10 +155,11 @@ class Auth {
     }
   }
 
-  static Future<bool> validateCredentials(String cnic, String password) async {
+  static Future<bool> validateCredentials(
+      String cnic, String password, String role) async {
     try {
       QuerySnapshot query = await firestore
-          .collection('patients')
+          .collection(role == 'Doctor' ? 'Doctor' : 'Patient')
           .where('cnic', isEqualTo: cnic)
           .get();
 
@@ -146,23 +175,22 @@ class Auth {
     }
   }
 
-  static Future<bool> doesUserExist(String cnic) async {
-    CollectionReference users =
-        FirebaseFirestore.instance.collection('patients');
+  static Future<bool> doesUserExist(String cnic, String role) async {
+    CollectionReference users = FirebaseFirestore.instance
+        .collection(role == 'Doctor' ? 'Doctor' : 'Patient');
 
     QuerySnapshot query = await users.where('cnic', isEqualTo: cnic).get();
     print('Query result: ${query.docs}');
     return query.docs.isNotEmpty;
   }
 
-  static void signUp(User user, BuildContext context) async {
+  static void signUp(User user, BuildContext context, String role) async {
     if (user.userName == null ||
         user.password == null ||
         user.confirmPassword == null ||
         user.gender == null ||
         user.cnic == null ||
         user.dob == null) {
-      print(user.dob);
       var snackbar =
           const SnackBar(content: Text("Please fill all the fields"));
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
@@ -172,13 +200,25 @@ class Auth {
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
       Navigator.pop(context);
     }
-    bool userExists = await Auth.doesUserExist(user.cnic!);
+    bool userExists = await Auth.doesUserExist(user.cnic!, role);
 
     if (userExists) {
       var snackbar = const SnackBar(content: Text("User already exists!"));
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
     } else {
-      Auth.registerUser(context, user);
+      Auth.registerUser(context, user, role);
     }
   }
+}
+
+Future<List<Map<String, dynamic>>> fetchData(String role) async {
+  final CollectionReference collection =
+      FirebaseFirestore.instance.collection(role);
+
+  QuerySnapshot querySnapshot = await collection.get();
+  List<Map<String, dynamic>> data = querySnapshot.docs
+      .map((doc) => doc.data() as Map<String, dynamic>)
+      .toList();
+
+  return data;
 }

@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, must_be_immutable
 
 import 'package:doctor_appointment_app/components/my_row.dart';
-import 'package:doctor_appointment_app/views/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,8 +20,10 @@ class SignupView extends StatefulWidget {
       required this.gender,
       required this.nic,
       required this.dob,
+      required this.onLoginTap,
       required this.cpassw,
-      required this.user});
+      required this.user,
+      required this.role});
   final Function()? ontap;
   final Function(String) name;
   final Function(String) passw;
@@ -30,13 +31,17 @@ class SignupView extends StatefulWidget {
   final Function(String) gender;
   final Function(String) nic;
   final Function(String) dob;
+  final Function() onLoginTap;
   final User user;
+  final String role;
 
   @override
   State<SignupView> createState() => _SignupViewState();
 }
 
 class _SignupViewState extends State<SignupView> {
+  final _items = ["Male", "Female"];
+  String dropdownValue = "Male";
   String cnic = "";
   String pass = "";
 
@@ -87,9 +92,6 @@ class _SignupViewState extends State<SignupView> {
                 ),
                 MyTextfield(
                     onChanged: widget.passw,
-                    // (val) {
-                    //   user.password = val;
-                    // },
                     hintText: "Password",
                     icon: Icons.remove_red_eye),
                 const SizedBox(
@@ -101,9 +103,6 @@ class _SignupViewState extends State<SignupView> {
                 ),
                 MyTextfield(
                     onChanged: widget.cpassw,
-                    // (val) {
-                    //   user.confirmPassword = val;
-                    // },
                     hintText: "Password",
                     icon: Icons.remove_red_eye),
                 const SizedBox(
@@ -113,13 +112,35 @@ class _SignupViewState extends State<SignupView> {
                 const SizedBox(
                   height: 5,
                 ),
-                MyTextfield(
-                    onChanged: widget.gender,
-                    // (val) {
-                    //   user.gender = val;
-                    // },
-                    hintText: "Gender",
-                    icon: Icons.male),
+                Container(
+                  padding: const EdgeInsets.all(7),
+                  width: double.infinity,
+                  height: 60,
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blue),
+                      borderRadius: const BorderRadius.all(Radius.circular(5))),
+                  child: DropdownButton(
+                    underline: Container(
+                      height:
+                          0.0, // Set the height to 0.0 to remove the underline
+                      color: Colors.transparent, // Set the color to transparent
+                    ),
+                    elevation: 10,
+                    items: _items.map((String item) {
+                      return DropdownMenuItem(
+                        value: item,
+                        child: Text(item),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        widget.gender(val ?? '');
+                        dropdownValue = val ?? '';
+                      });
+                    },
+                    value: dropdownValue,
+                  ),
+                ),
                 const SizedBox(
                   height: 20,
                 ),
@@ -129,10 +150,7 @@ class _SignupViewState extends State<SignupView> {
                 ),
                 MyTextfield(
                     onChanged: widget.nic,
-                    // (val) {
-                    //   user.cnic = val;
-                    // },
-                    hintText: "CNIC",
+                    hintText: "42201-4918973-9",
                     icon: Icons.perm_identity),
                 const SizedBox(
                   height: 20,
@@ -180,7 +198,7 @@ class _SignupViewState extends State<SignupView> {
                   font: 25,
                   text: "Sign In",
                   ontap: () {
-                    Auth.signUp(widget.user, context);
+                    Auth.signUp(widget.user, context, widget.role);
                   },
                   width: 300,
                   height: 60,
@@ -196,12 +214,7 @@ class _SignupViewState extends State<SignupView> {
                       style: Helpers.colour,
                     ),
                     InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const LoginView()));
-                      },
+                      onTap: widget.onLoginTap,
                       child: Text(
                         " Login!",
                         style: TextStyle(
