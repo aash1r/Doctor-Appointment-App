@@ -31,8 +31,14 @@ class _ChatViewState extends State<ChatView> {
   Future<void> setDoc() async {
     QuerySnapshot querySnapshot = await collection.get();
     if (querySnapshot.docs.isNotEmpty) {
-      document = querySnapshot.docs
-          .firstWhere((doc) => doc['userCnic'] == widget.user.cnic);
+      document = querySnapshot.docs.firstWhere((doc) {
+        bool checkOne = doc['userCnic'] == widget.user.cnic ||
+            doc['userCnic'] == widget.admin.cnic;
+        bool checkTwo = doc['adminCnic'] == widget.user.cnic ||
+            doc['adminCnic'] == widget.admin.cnic;
+        return checkOne && checkTwo;
+      });
+      setState(() {});
     }
   }
 
