@@ -1,4 +1,4 @@
-import 'package:doctor_appointment_app/views/chat_view.dart';
+import 'package:doctor_appointment_app/views/chat/chat_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/auth.dart';
@@ -15,7 +15,7 @@ class DoctorHomeView extends StatefulWidget {
 
 class _DoctorHomeViewState extends State<DoctorHomeView> {
   late Future<List<Map<String, dynamic>>> data;
-  User? user;
+  User? admin;
 
   @override
   void initState() {
@@ -25,7 +25,7 @@ class _DoctorHomeViewState extends State<DoctorHomeView> {
   }
 
   Future<void> loadUserData(String cnic) async {
-    user = await Auth.getUserData(cnic, 'Doctor');
+    admin = await Auth.getUserData(cnic, 'Doctor');
     setState(() {});
   }
 
@@ -35,7 +35,7 @@ class _DoctorHomeViewState extends State<DoctorHomeView> {
       appBar: AppBar(
         backgroundColor: const Color(0xffB28cff),
         title: Text(
-          "Welcome ${user?.userName ?? ''}",
+          "Welcome ${admin?.userName ?? ''}",
           style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 15),
         ),
       ),
@@ -45,18 +45,18 @@ class _DoctorHomeViewState extends State<DoctorHomeView> {
           padding: const EdgeInsets.all(8.0),
           child: ListView(
             children: [
-              Text("Gender: ${user?.gender ?? ''}",
+              Text("Gender: ${admin?.gender ?? ''}",
                   style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
               const SizedBox(
                 height: 5,
               ),
-              Text("National Id: ${user?.cnic ?? ''}",
+              Text("National Id: ${admin?.cnic ?? ''}",
                   style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
               const SizedBox(
                 height: 5,
               ),
               Text(
-                "Date of birth: ${user?.dob.toString() ?? ""}", // user?.dob.toString() ?? 'DOB',
+                "Date of birth: ${admin?.dob.toString() ?? ""}", // user?.dob.toString() ?? 'DOB',
                 style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
               ),
               const SizedBox(
@@ -104,6 +104,7 @@ class _DoctorHomeViewState extends State<DoctorHomeView> {
                                         builder: (_) => ChatView(
                                               user: User.fromDocument(
                                                   item as Map<String, dynamic>),
+                                              admin: admin ?? User(),
                                             )));
                               },
                               child: ListTile(
@@ -114,7 +115,7 @@ class _DoctorHomeViewState extends State<DoctorHomeView> {
                                         color: const Color.fromARGB(
                                             255, 218, 211, 233)),
                                     child: Text(
-                                      'Doctor: ${item?['userName']}',
+                                      'Patient: ${item?['userName']}',
                                       style: GoogleFonts.manrope(
                                           fontWeight: FontWeight.w500),
                                     )),
