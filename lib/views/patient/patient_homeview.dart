@@ -90,7 +90,6 @@ class _PatientHomeViewState extends State<PatientHomeView> {
                   } else if (snapshot.hasError) {
                     return Text("Error: ${snapshot.error}");
                   } else {
-                    print(snapshot.data);
                     return Expanded(
                       child: ListView.builder(
                           itemCount: snapshot.data?.length,

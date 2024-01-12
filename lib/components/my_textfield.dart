@@ -35,11 +35,11 @@ class _MyTextfieldState extends State<MyTextfield> {
       cursorColor: Colors.black38,
       obscureText: widget.icon != null ? false : obsecureText,
       decoration: InputDecoration(
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.blue.shade600),
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFFB28CFF)),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.blue.shade600),
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFFB28CFF)),
         ),
         suffixIconColor: Colors.blue.shade600,
         suffixIcon: GestureDetector(
