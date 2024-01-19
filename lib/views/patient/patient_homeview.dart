@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/auth.dart';
 import '../../services/user.dart';
+import '../appointment_view.dart';
 import '../chat/chat_view.dart';
 import '../login_view.dart';
 
 class PatientHomeView extends StatefulWidget {
   final String cnic;
-  const PatientHomeView({super.key, required this.cnic});
+  const PatientHomeView({super.key, required this.cnic, required this.user});
+  final User user;
 
   @override
   State<PatientHomeView> createState() => _PatientHomeViewState();
@@ -120,7 +122,22 @@ class _PatientHomeViewState extends State<PatientHomeView> {
                           }),
                     );
                   }
-                })
+                }),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                  onPressed: () {
+                    print(widget.cnic);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => AppointmentView(
+                                  user: widget.user,
+                                  patientCnic: widget.cnic,
+                                )));
+                  },
+                  child: const Text("Book your appointment")),
+            )
           ],
         ),
       ),

@@ -1,12 +1,9 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:doctor_appointment_app/views/appointment_view.dart';
 import 'package:doctor_appointment_app/views/chat/message.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uuid/uuid.dart';
-
 import '../../../services/user.dart';
 
 class ChatView extends StatefulWidget {
@@ -64,6 +61,7 @@ class _ChatViewState extends State<ChatView> {
         'adminCnic': widget.admin.cnic,
       });
       await setDoc();
+      messageController.clear();
     }
   }
 
@@ -100,29 +98,6 @@ class _ChatViewState extends State<ChatView> {
           widget.user.userName ?? "",
           style: GoogleFonts.manrope(fontWeight: FontWeight.bold, fontSize: 20),
         ),
-        actions: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => AppointmentView(
-                            user: widget.user.userName,
-                          )));
-            },
-            child: Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                  color: const Color(0xFFB28CFF),
-                  borderRadius: BorderRadius.circular(10)),
-              child: Text(
-                "Book an appointment",
-                style: GoogleFonts.manrope(
-                    fontWeight: FontWeight.bold, fontSize: 12),
-              ),
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         child: Column(
@@ -144,7 +119,7 @@ class _ChatViewState extends State<ChatView> {
                     ));
                   }
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const Center(child: CircularProgressIndicator());
                   }
                   if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
@@ -203,7 +178,7 @@ class _ChatViewState extends State<ChatView> {
                       newMessage.cnic = widget.admin.cnic;
                       newMessage.currentDate = DateTime.now();
                       allMessages.add(newMessage);
-                      messageController.clear();
+
                       await sendMessage();
                       setState(() {});
                     },

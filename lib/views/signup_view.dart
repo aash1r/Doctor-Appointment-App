@@ -129,7 +129,11 @@ class _SignupViewState extends State<SignupView> {
                     items: _items.map((String item) {
                       return DropdownMenuItem(
                         value: item,
-                        child: Text(item),
+                        child: Text(
+                          item,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w200, fontSize: 15),
+                        ),
                       );
                     }).toList(),
                     onChanged: (val) {

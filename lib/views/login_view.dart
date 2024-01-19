@@ -53,7 +53,7 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(
                   height: 20,
                 ),
-                const MyRow(labelText: "National-Id"),
+                const MyRow(labelText: "National-Id | (use dashes)"),
                 const SizedBox(
                   height: 5,
                 ),

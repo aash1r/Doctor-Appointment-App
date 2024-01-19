@@ -66,6 +66,7 @@ class Auth {
             MaterialPageRoute(
                 builder: (_) => PatientHomeView(
                       cnic: user.cnic!,
+                      user: User(),
                     )),
           );
         });
@@ -110,6 +111,7 @@ class Auth {
                 MaterialPageRoute(
                     builder: (_) => PatientHomeView(
                           cnic: cnic,
+                          user: User(),
                         )),
               );
             });
