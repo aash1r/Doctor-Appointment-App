@@ -1,3 +1,4 @@
+import 'package:doctor_appointment_app/components/my_floating_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/auth.dart';
@@ -137,7 +138,8 @@ class _PatientHomeViewState extends State<PatientHomeView> {
                                 )));
                   },
                   child: const Text("Book your appointment")),
-            )
+            ),
+            const MyFloatingButton()
           ],
         ),
       ),

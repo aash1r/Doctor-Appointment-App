@@ -4,7 +4,8 @@ import 'package:doctor_appointment_app/views/signup_view.dart';
 import 'package:flutter/material.dart';
 
 class PatientSignup extends StatefulWidget {
-  const PatientSignup({super.key});
+  const PatientSignup({super.key, required this.role});
+  final role;
 
   @override
   State<PatientSignup> createState() => _PatientSignupState();

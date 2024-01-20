@@ -139,7 +139,9 @@ class _LoginViewState extends State<LoginView> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => const PatientSignup()));
+                                builder: (_) => const PatientSignup(
+                                      role: 'Patient',
+                                    )));
                       },
                       child: Text(
                         " Register yourself now!",

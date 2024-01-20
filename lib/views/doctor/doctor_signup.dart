@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import '../login_view.dart';
 
 class DoctorSignup extends StatefulWidget {
-  const DoctorSignup({super.key});
+  const DoctorSignup({super.key, required this.role});
+  final role;
 
   @override
   State<DoctorSignup> createState() => _DoctorSignupState();

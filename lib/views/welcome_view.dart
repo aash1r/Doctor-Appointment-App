@@ -32,7 +32,9 @@ class WelcomeView extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const PatientSignup()));
+                              builder: (_) => const PatientSignup(
+                                    role: 'Patient',
+                                  )));
                     },
                     child: const MyButton(
                       font: 18,
@@ -48,7 +50,9 @@ class WelcomeView extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const DoctorSignup()));
+                              builder: (_) => const DoctorSignup(
+                                    role: 'Doctor',
+                                  )));
                     },
                     child: const MyButton(
                       font: 18,
