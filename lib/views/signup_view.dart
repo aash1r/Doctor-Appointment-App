@@ -200,7 +200,7 @@ class _SignupViewState extends State<SignupView> {
                 ),
                 MyButton(
                   font: 25,
-                  text: "Sign In",
+                  text: "Sign Up",
                   ontap: () {
                     Auth.signUp(widget.user, context, widget.role);
                   },

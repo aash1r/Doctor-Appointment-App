@@ -47,8 +47,11 @@ class Auth {
         'gender': user.gender, // Add more fields as needed
         'userName': user.userName,
         'dob': user.dob,
-        'role': role
+        'role': user.role
       });
+      print("this is signup role: $role");
+      // Navigator.push(
+      //     context, MaterialPageRoute(builder: (_) => const LoginView()));
       if (role == "Doctor") {
         Future.delayed(const Duration(milliseconds: 300), () {
           Navigator.push(
@@ -145,8 +148,15 @@ class Auth {
 
       if (query.docs.isNotEmpty) {
         DocumentSnapshot userDoc = query.docs.first;
-        final user = userDoc.data() as Map<String, dynamic>;
-        return User.fromDocument(user);
+
+        // Check if userDoc is not null before attempting to access data
+        if (userDoc.data() != null) {
+          final user = userDoc.data() as Map<String, dynamic>;
+          return User.fromDocument(user);
+        } else {
+          print('User data is null for CNIC: $cnic');
+          return User(); // Return an empty map if user data is null
+        }
       } else {
         print('User not found for CNIC: $cnic');
         return User(); // Return an empty map if user is not found
@@ -156,6 +166,28 @@ class Auth {
       return User(); // Return an empty map on error
     }
   }
+
+  // static Future<User> getUserData(String cnic, String role) async {
+  //   try {
+  //     print('Role: $role, CNIC: $cnic');
+  //     QuerySnapshot query = await firestore
+  //         .collection(role == 'Doctor' ? "Doctor" : "Patient")
+  //         .where('cnic', isEqualTo: cnic)
+  //         .get();
+
+  //     if (query.docs.isNotEmpty) {
+  //       DocumentSnapshot userDoc = query.docs.first;
+  //       final user = userDoc.data() as Map<String, dynamic>;
+  //       return User.fromDocument(user);
+  //     } else {
+  //       print('User not found for CNIC: $cnic');
+  //       return User(); // Return an empty map if user is not found
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching user data for CNIC $cnic: $e');
+  //     return User(); // Return an empty map on error
+  //   }
+  // }
 
   static Future<bool> validateCredentials(
       String cnic, String password, String role) async {
